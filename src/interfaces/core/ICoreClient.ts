@@ -1,3 +1,3 @@
 export interface ICoreClient {
-    post: (query: string) => Promise<any>
+    post: (query: string) => Promise<Response>
 }

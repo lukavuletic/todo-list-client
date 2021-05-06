@@ -1,7 +1,7 @@
 const url = 'http://localhost:4000/api';
 
 class CoreClient {
-    post: (query: string) => Promise<any> = (query: string) => {
+    post: (query: string) => Promise<Response> = (query: string) => {
         return fetch(url, {
             method: 'POST',
             headers: {
