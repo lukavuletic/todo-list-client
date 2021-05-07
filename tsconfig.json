@@ -20,7 +20,9 @@
     "noEmit": true,
     "jsx": "react",
     "baseUrl": "src",
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "outDir": "dist"
   },
   "include": [
     "src"
