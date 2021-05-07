@@ -148,7 +148,7 @@ export const TodoPage: React.FC<Props> = ({
             </div>
             <br />
             <div className="todo-wrapper">
-                {todos.length > 0 && todos.filter((todo: ITodo) => selectedCategories.includes(todo.category))
+                {todos.length > 0 ? todos.filter((todo: ITodo) => selectedCategories.includes(todo.category))
                     .sort((a, b) => a.category.localeCompare(b.category))
                     .map((todo: ITodo) => {
                         return (
@@ -162,6 +162,8 @@ export const TodoPage: React.FC<Props> = ({
                             </div>
                         )
                     })
+                    :
+                    'No tasks yet created, create one by pressing + button above'
                 }
             </div>
         </React.Fragment>
