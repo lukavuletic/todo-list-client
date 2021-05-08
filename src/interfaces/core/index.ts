@@ -1,1 +1,1 @@
-export { ICoreClient } from './ICoreClient';
+export type { ICoreClient } from './ICoreClient';

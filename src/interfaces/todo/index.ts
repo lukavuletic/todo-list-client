@@ -1,1 +1,1 @@
-export { ITodo } from './ITodo';
+export type { ITodo } from './ITodo';
