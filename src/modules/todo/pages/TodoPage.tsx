@@ -11,8 +11,10 @@ import { DELETE_TODO, GET_TODOS, UPDATE_TODO } from 'graphqlapi';
 
 export const TodoPage: React.FC = () => {
     const { error, loading, data } = useQuery(GET_TODOS);
+
     const [deleteTodo] = useMutation(DELETE_TODO);
     const [updateTodo] = useMutation(UPDATE_TODO);
+
     const [isCreateFormShown, setStateToggleCreateFormShown] = useState<boolean>(false);
     const [todos, setStateTodos] = useState<ITodo[]>([]);
     const [categories, setStateCategories] = useState<ITodo['category'][]>([]);

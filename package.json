@@ -4,12 +4,7 @@
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.3.16",
-    "@testing-library/jest-dom": "^5.12.0",
-    "@testing-library/react": "^11.2.6",
-    "@testing-library/user-event": "^12.8.3",
-    "@types/jest": "24.0.18",
     "@types/lodash": "^4.14.168",
-    "@types/node": "12.7.4",
     "@types/react": "^17.0.5",
     "@types/react-dom": "^17.0.3",
     "graphql": "^15.5.0",
@@ -17,19 +12,16 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
-    "typescript": "^4.2.4",
-    "web-vitals": "^1.1.1"
+    "typescript": "^4.2.4"
   },
   "scripts": {
     "start": "tsc && react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
-      "react-app",
-      "react-app/jest"
+      "react-app"
     ]
   },
   "browserslist": {
