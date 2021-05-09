@@ -1,20 +1,38 @@
-import React from 'react';
+import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, from, } from "@apollo/client";
+import { ErrorResponse, onError } from "@apollo/client/link/error";
 
 import './App.css';
 
 import { TodoPage } from 'modules/todo/pages';
 
-import { CoreClient } from 'core';
+const errorLink = onError(({ graphQLErrors, networkError }: ErrorResponse) => {
+  if (graphQLErrors) {
+    graphQLErrors.forEach(({ message, locations, path }) => {
+      alert(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`);
+    });
+  }
+  if (networkError) {
+    alert(`[Network error]: ${networkError}`);
+  }
+});
+
+const link = from([
+  errorLink,
+  new HttpLink({ uri: "http://localhost:4000/api" }),
+]);
+
+const client = new ApolloClient({
+  cache: new InMemoryCache(),
+  link: link,
+});
 
 function App() {
-  const coreClient = new CoreClient();
-
   return (
-    <div className="container" >
-      <TodoPage
-        coreClient={coreClient}
-      />
-    </div>
+    <ApolloProvider client={client}>
+      <div className="container" >
+        <TodoPage />
+      </div>
+    </ApolloProvider>
   );
 }
 

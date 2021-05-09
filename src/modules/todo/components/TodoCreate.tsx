@@ -1,10 +1,11 @@
 import React, { FormEvent, useState } from 'react';
+import { useMutation } from '@apollo/client';
 
 import { ITodo } from 'interfaces/todo';
-import { ICoreClient } from 'interfaces/core';
+
+import { CREATE_TODO } from 'graphqlapi';
 
 interface Props {
-    coreClient: ICoreClient;
     state: {
         categories: ITodo['category'][],
         selectedCategories: ITodo['category'][],
@@ -17,7 +18,6 @@ interface Props {
 }
 
 export const TodoCreate: React.FC<Props> = ({
-    coreClient,
     state: {
         categories,
         selectedCategories,
@@ -39,35 +39,33 @@ export const TodoCreate: React.FC<Props> = ({
         setStateCategoryInputValue(value);
     }
 
-    const createTodo = async (e: FormEvent): Promise<void> => {
+    const [createTodo, { error }] = useMutation(CREATE_TODO);
+
+    const addTodo = async (e: FormEvent): Promise<void> => {
         e.preventDefault();
 
-        try {
-            const createdItem: ITodo = await coreClient.post(
-                `mutation {
-                    createTodo(task: "${taskInputValue}", category: "${categoryInputValue}" ) {
-                        todoID
-                        task
-                        category
-                    }
-                }`
-            ).then(r => r.json()).then(data => data.data.createTodo);
+        const createdItem = await createTodo({
+            variables: {
+                task: taskInputValue,
+                category: categoryInputValue
+            }
+        });
 
-            setStateTodos([...todos, createdItem]);
+        if (error) {
+            throw error;
+        } else {
+            setStateTodos([...todos, createdItem.data.createTodo]);
             // if label is newly created, select it by defualt
             if (!categories.includes(categoryInputValue)) {
                 setStateSelectedCategories([...selectedCategories, categoryInputValue]);
             }
             setStateTaskInputValue('');
             setStateCategoryInputValue('');
-        } catch (err) {
-            console.log(err);
-            throw new Error('failed to create the todo');
         }
     }
 
     return (
-        <form onSubmit={createTodo}>
+        <form onSubmit={addTodo}>
             <div className="inputField">
                 <label htmlFor="task">Task name: </label>
                 <input id="task" type="text" name="task" value={taskInputValue} onChange={(e: { target: HTMLInputElement }) => onTaskInputChange(e.target.value)} />

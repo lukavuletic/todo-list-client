@@ -1,63 +1,34 @@
 import React, { useEffect, useState } from 'react';
+import { useQuery, useMutation } from '@apollo/client';
+import { cloneDeep } from 'lodash';
 
 import { Category } from 'modules/category/components';
 import { TodoItem, TodoCreate } from 'modules/todo/components';
 
 import { ITodo } from 'interfaces/todo';
-import { ICoreClient } from 'interfaces/core';
 
-interface Props {
-    coreClient: ICoreClient;
-}
+import { DELETE_TODO, GET_TODOS, UPDATE_TODO } from 'graphqlapi';
 
-export const TodoPage: React.FC<Props> = ({
-    coreClient,
-}) => {
+export const TodoPage: React.FC = () => {
+    const { error, loading, data } = useQuery(GET_TODOS);
+    const [deleteTodo] = useMutation(DELETE_TODO);
+    const [updateTodo] = useMutation(UPDATE_TODO);
     const [isCreateFormShown, setStateToggleCreateFormShown] = useState<boolean>(false);
     const [todos, setStateTodos] = useState<ITodo[]>([]);
     const [categories, setStateCategories] = useState<ITodo['category'][]>([]);
     const [selectedCategories, setStateSelectedCategories] = useState<ITodo['category'][]>([]);
 
     useEffect(() => {
-        const getTodos = async (isInitial: boolean = false): Promise<ITodo[]> => {
-            try {
-                const res: ITodo[] = await coreClient.post(
-                    `{ 
-                        todos { 
-                            todoID
-                            task
-                            category 
-                        } 
-                    }`
-                ).then(r => r.json()).then(data => data.data.todos);
+        if (data) {
+            setStateTodos(data.todos);
+            const categories: ITodo["category"][] = data.todos.map(({ category }: { category: ITodo["category"] }) => category);
+            const uniqueCategories: ITodo['category'][] = [...new Set(categories)];
 
-                const categories: ITodo["category"][] = res.map(({ category }: { category: ITodo["category"] }) => category);
-                setStateCategories([...new Set(categories)]);
-
-                if (isInitial) {
-                    setStateCategories(categories);
-                }
-
-                return res;
-            } catch (err) {
-                console.log(err);
-                throw new Error('failed to get todos');
-            }
-        }
-
-        const onInitialize = async (): Promise<void> => {
-            const todosRes: ITodo[] = await getTodos(true);
-            const categories: ITodo["category"][] = todosRes.map(({ category }: { category: ITodo["category"] }) => category);
-
-            setStateTodos(todosRes);
-
-            const uniqueCategories: ITodo['category'][] = [...new Set(categories)]
+            setStateCategories([...new Set(categories)]);
             setStateCategories(uniqueCategories);
             setStateSelectedCategories(uniqueCategories);
         }
-
-        onInitialize();
-    }, [coreClient]);
+    }, [data]);
 
     useEffect(() => {
         const onTodosChange = (): void => {
@@ -69,43 +40,39 @@ export const TodoPage: React.FC<Props> = ({
         onTodosChange();
     }, [todos]);
 
-    const deleteTodo = async (id: ITodo['todoID']): Promise<void> => {
+    const removeTodo = async (id: ITodo['todoID']): Promise<void> => {
         try {
-            await coreClient.post(
-                `mutation {
-                    deleteTodo(todoID:${id})
-                }`
-            );
-
+            await deleteTodo({
+                variables: {
+                    id,
+                },
+            });
             setStateTodos(todos.filter(({ todoID }) => todoID !== id));
         } catch (err) {
-            console.log(err);
-            throw new Error('failed to delete the todo');
+            throw new Error('Item could not be deleted')
         }
     };
 
     const onTodoItemTaskInputChange = (todoID: number, value: ITodo["task"]): void => {
         const todoItemIdx: number = todos.findIndex((todo: ITodo) => todo.todoID === todoID);
-        const todosSlice: ITodo[] = todos.slice();
-        todosSlice[todoItemIdx].task = value;
+        const todosClone: ITodo[] = cloneDeep(todos);
+        todosClone[todoItemIdx].task = value;
 
-        setStateTodos(todosSlice);
+        setStateTodos(todosClone);
     };
 
-    const onTodoItemTaskInputSave = async (todoID: ITodo["todoID"]): Promise<void> => {
+    const onTodoItemTaskInputSave = async (id: ITodo["todoID"]): Promise<void> => {
         try {
-            const todoItem: ITodo = todos.find((todo: ITodo) => todo.todoID === todoID)!;
-
-            await coreClient.post(
-                `mutation {
-                    updateTodo(todoID: ${todoID}, task: "${todoItem.task}", category: "${todoItem.category}") {
-                    task
-                    }
-                }`
-            );
+            const todoItem: ITodo = todos.find((todo: ITodo) => todo.todoID === id)!;
+            updateTodo({
+                variables: {
+                    id: todoItem.todoID,
+                    task: todoItem.task,
+                    category: todoItem.category,
+                },
+            });
         } catch (err) {
-            console.log(err);
-            throw new Error('failed to update the todo');
+            throw new Error('Failed to update the todo');
         }
     };
 
@@ -118,6 +85,16 @@ export const TodoPage: React.FC<Props> = ({
         }
     };
 
+    if (loading) {
+        return (
+            <div>Loading...</div>
+        )
+    }
+
+    if (error) {
+        <div>Oops... something went wrong, please contact the support team</div>
+    }
+
     return (
         <React.Fragment>
             <header>Todo list</header>
@@ -126,7 +103,6 @@ export const TodoPage: React.FC<Props> = ({
             </button>
             {isCreateFormShown &&
                 <TodoCreate
-                    coreClient={coreClient}
                     state={{ categories, selectedCategories, todos }}
                     actions={{ setStateTodos, setStateSelectedCategories }}
                 />
@@ -155,7 +131,7 @@ export const TodoPage: React.FC<Props> = ({
                             <div key={todo.todoID}>
                                 <TodoItem
                                     todo={todo}
-                                    onDelete={deleteTodo}
+                                    onDelete={removeTodo}
                                     onTodoItemTaskInputChange={onTodoItemTaskInputChange}
                                     onSave={onTodoItemTaskInputSave}
                                 />
