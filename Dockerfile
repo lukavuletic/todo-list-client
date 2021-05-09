@@ -1,12 +1,12 @@
-FROM  mhart/alpine-node:8.11.4
+FROM node:12.0.0
 
-WORKDIR /client
+WORKDIR /src
 
-COPY package*.json /client/
+COPY ./package.json ./
 
 RUN npm i
 
-COPY . /client/
+COPY . .
 
 EXPOSE 3000
 
