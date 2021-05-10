@@ -6,7 +6,20 @@ The other mandatory repository that needs to be ran for this project can be foun
 
 For connection to the express server (api), please set environment variables in .env file in root folder.
 
-To run with docker-compose please create a docker-compose.yml file in a folder that includes both todo-list-api and todo-list-client and execute command `docker-compose up --build -d`
+To run with docker-compose please create a docker-compose.yml file in a folder that includes both todo-list-api and todo-list-client and setup .env file next to docker-compose.yml file then execute command `docker-compose up --build -d`
+
+.env
+```
+PG_PORT_1=HOST_PORT_FOR_POSTGRES
+PG_PORT_2=CONTAINER_PORT_FOR_POSTGRES
+PG_USER=POSTGRES_USERNAME
+PG_PW=POSTGRES_PASSWORD
+HOST=HOST_NAME
+API_PORT_1=HOST_PORT_FOR_API
+API_PORT_2=CONTAINER_PORT_FOR_API
+CLIENT_PORT_1=HOST_PORT_FOR_CLIENT
+CLIENT_PORT_2=CONTAINER_PORT_FOR_CLIENT
+```
 
 docker-compose.yml
 ```yml:
@@ -15,14 +28,14 @@ version: "3"
 services:
     postgres:
         image: postgres
-        hostname: postgres
+        hostname: "${HOST}"
         container_name: postgres
         restart: always
         ports:
-            - "5433:5432"
+            - "${PG_PORT_1}:${PG_PORT_2}"
         environment: 
-            POSTGRES_USER: superuser
-            POSTGRES_PASSWORD: superuser
+            POSTGRES_USER: "${PG_USER}"
+            POSTGRES_PASSWORD: "${PG_PW}"
         volumes: 
             - ./postgres-data:/var/lib/postgreslql/data
         networks: 
@@ -32,7 +45,7 @@ services:
         hostname: api
         container_name: api
         ports:
-            - "4000:4000"
+            - "${API_PORT_1}:${API_PORT_2}"
         volumes:
             - /api:/node_modules
         build:
@@ -46,7 +59,7 @@ services:
         hostname: client
         container_name: client
         ports:
-            - "3000:3000"
+            - "${CLIENT_PORT_1}:${CLIENT_PORT_2}"
         volumes:
             - /client:/node_modules
         build:
@@ -59,4 +72,5 @@ services:
 networks: 
     todo-list-network:
         driver: bridge
+
 ```
