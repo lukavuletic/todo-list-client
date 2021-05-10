@@ -52,7 +52,7 @@ export const TodoCreate: React.FC<Props> = ({
         });
 
         if (error) {
-            throw error;
+            alert(error);
         } else {
             setStateTodos([...todos, createdItem.data.createTodo]);
             // if label is newly created, select it by defualt

@@ -29,7 +29,7 @@ const client = new ApolloClient({
 function App() {
   return (
     <ApolloProvider client={client}>
-      <div className="container" >
+      <div className="container">
         <TodoPage />
       </div>
     </ApolloProvider>

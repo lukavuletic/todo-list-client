@@ -51,7 +51,7 @@ export const TodoPage: React.FC = () => {
             });
             setStateTodos(todos.filter(({ todoID }) => todoID !== id));
         } catch (err) {
-            throw new Error('Item could not be deleted')
+            alert('Item could not be deleted')
         }
     };
 
@@ -74,7 +74,7 @@ export const TodoPage: React.FC = () => {
                 },
             });
         } catch (err) {
-            throw new Error('Failed to update the todo');
+            alert('Failed to update the todo');
         }
     };
 
