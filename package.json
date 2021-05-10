@@ -1,7 +1,6 @@
 {
   "name": "todo-list",
   "version": "1.0.0",
-  "todo-list-api-version" : "1.0.0",
   "todo-list-api-version": "1.0.0",
   "private": true,
   "dependencies": {
@@ -9,18 +8,22 @@
     "@types/lodash": "^4.14.168",
     "@types/react": "^17.0.5",
     "@types/react-dom": "^17.0.3",
+    "copyfiles": "^2.4.1",
     "dotenv": "^9.0.1",
     "graphql": "^15.5.0",
     "lodash": "^4.17.21",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
+    "rimraf": "^3.0.2",
+    "ts-node": "^9.1.1",
     "typescript": "^4.2.4"
   },
   "scripts": {
-    "start": "tsc && react-scripts start",
+    "start": "rimraf dist/ && tsc && copyfiles -u 1 public/* src/*.css dist/ && node dist/index.js ",
     "build": "react-scripts build",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "start:ts": "react-scripts start"
   },
   "eslintConfig": {
     "extends": [
