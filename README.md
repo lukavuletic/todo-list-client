@@ -44,7 +44,7 @@ services:
         hostname: api
         container_name: api
         ports:
-            - "${API_PORT_1}:${API_PORT_2}"
+            - "${API_PORT}:${REACT_APP_API_PORT}"
         volumes:
             - /api:/node_modules
         build:
@@ -71,5 +71,4 @@ services:
 networks: 
     todo-list-network:
         driver: bridge
-
 ```
