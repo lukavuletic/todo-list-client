@@ -4,9 +4,8 @@ In order to run todo-list-client, in your terminal write `npm i` then `npm start
 
 The other mandatory repository that needs to be ran for this project can be found on this link - https://github.com/lukavuletic/todo-list-api
 
-For connection to the express server (api), please set environment variables in .env file in root folder.
-
 To run with docker-compose please create a docker-compose.yml file in a folder that includes both todo-list-api and todo-list-client and setup .env file next to docker-compose.yml file then execute command `docker-compose up --build -d`
+**Keep in mind that even if you decide to run without docker-compose, you still need .env file setup**
 
 .env
 ```
